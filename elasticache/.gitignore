@@ -1,0 +1,15 @@
+*.pyc
+__pycache__
+*.egg-info
+build/
+dist/
+.uptodate
+/.env
+test-results/junit-*.xml
+/.cache
+.ensure-*
+/.tox
+/.coverage
+
+# Documentation
+docs/build
