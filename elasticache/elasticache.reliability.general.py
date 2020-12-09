@@ -18,7 +18,7 @@ Region = Template(
 
 Cluster = Template(
         name='Cluster',
-        label='Cluster',
+        label='Redis Cluster',
         query='label_values(aws_ec_cache_hits_average{region=~"$Region"}, dimension_CacheClusterId)',
         type='query',
         includeAll=True,
