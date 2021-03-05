@@ -7,27 +7,28 @@ from grafanalib.core import (
 
 DATASOURCE="Chronosphere Prometheus"
 
-Region = Template(
-        name='Region',
-        label='Region',
-        query='label_values(aws_ec_cache_hits_average,  region)',
+Environment = Template(
+        name='environment',
+        label='Environment',
+        query='label_values(aws_ec_cpuutilization_average, environment)',
         type='query',
-        includeAll=True,
-        multi=True,
+        includeAll=False,
+        multi=False,
     )
 
 Cluster = Template(
-        name='Cluster',
+        name='cluster',
         label='Cluster',
-        query='label_values(aws_ec_cache_hits_average{region=~"$Region"}, dimension_CacheClusterId)',
+        query='label_values(aws_ec_curr_items_average{environment="$environment"}, dimension_cache_cluster_id)',
         type='query',
-        includeAll=True,
-        multi=True,
+        includeAll=False,
+        multi=False,
+        regex='/^(.*?)(-[\d]+)*$/'
     )
 
 dashboard = Dashboard(
-    title="Elasticache Drilldowns",
-    templating=Templating(list=[Region, Cluster]),
+    title="SRE Elasticache Drilldowns",
+    templating=Templating(list=[Environment, Cluster]),
     rows=[
         Row(panels=[
           Graph(
@@ -35,8 +36,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_freeable_memory_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_freeable_memory_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -50,8 +51,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_bytes_used_for_cache_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_bytes_used_for_cache_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -67,8 +68,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_swap_usage_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_swap_usage_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -82,8 +83,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_database_memory_usage_percentage_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_database_memory_usage_percentage_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -99,8 +100,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_freeable_memory_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_freeable_memory_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -114,8 +115,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_memory_fragmentation_ratio_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_memory_fragmentation_ratio_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -131,8 +132,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_curr_connections_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_curr_connections_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -146,8 +147,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_new_connections_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_new_connections_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -163,8 +164,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_cache_hits_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_cache_hits_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -178,8 +179,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_cache_misses_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_cache_misses_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -195,8 +196,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_set_type_cmds_latency_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_set_type_cmds_latency_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -210,8 +211,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_get_type_cmds_latency_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_get_type_cmds_latency_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -227,8 +228,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_key_based_cmds_latency_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_key_based_cmds_latency_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -242,8 +243,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_sorted_set_based_cmds_latency_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_sorted_set_based_cmds_latency_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -259,8 +260,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_hash_based_cmds_latency_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_hash_based_cmds_latency_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -274,8 +275,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_string_based_cmds_latency_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_string_based_cmds_latency_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -291,8 +292,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_set_based_cmds_latency_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_set_based_cmds_latency_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -306,8 +307,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_list_based_cmds_latency_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_list_based_cmds_latency_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -323,8 +324,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_set_type_cmds_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_set_type_cmds_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -338,8 +339,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_get_type_cmds_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_get_type_cmds_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -355,8 +356,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_key_based_cmds_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_key_based_cmds_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -370,8 +371,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_sorted_set_based_cmds_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_sorted_set_based_cmds_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -387,8 +388,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_hash_based_cmds_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_hash_based_cmds_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -402,8 +403,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_string_based_cmds_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_string_based_cmds_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -419,8 +420,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_set_based_cmds_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_set_based_cmds_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -434,8 +435,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_list_based_cmds_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_list_based_cmds_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -451,8 +452,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                    Target(
-                        expr='aws_ec_reclaimed_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_reclaimed_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -466,8 +467,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                    Target(
-                        expr='aws_ec_curr_items_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_curr_items_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -481,8 +482,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                    Target(
-                        expr='aws_ec_evictions_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_evictions_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -498,8 +499,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_cpuutilization_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_cpuutilization_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -513,8 +514,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_engine_cpuutilization_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_engine_cpuutilization_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -530,8 +531,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_network_bytes_in_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_network_bytes_in_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -545,8 +546,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_network_bytes_out_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_network_bytes_out_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -562,8 +563,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_network_packets_in_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_network_packets_in_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
@@ -577,8 +578,8 @@ dashboard = Dashboard(
                 dataSource=DATASOURCE,
                 targets=[
                     Target(
-                        expr='aws_ec_network_packet_out_average{dimension_CacheClusterId=~"$Cluster"}',
-                        legendFormat="{{dimension_CacheClusterId}}",
+                        expr='aws_ec_network_packet_out_average{environment="${environment}", dimension_cache_cluster_id=~"${cluster}.*"}',
+                        legendFormat="{{dimension_cache_cluster_id}}",
                         refId='A',
                     ),
                 ],
